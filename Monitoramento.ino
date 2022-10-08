@@ -19,7 +19,7 @@ float umidade; //Variável para armazenar a umidade
 void setup() {
   Serial.begin(115200); //Inicializa a comunicação serial
   pinMode(LED, OUTPUT); // define o LED como output
-  delay(100); // ?Intervalo para aguardar a estabilização do sistema
+  delay(100); // Intervalo para aguardar a estabilização do sistema
   dht.begin(); //Inicializa o sensor DHT11
 
   Serial.println("Conectando a Rede: "); //Imprime na serial a mensagem
@@ -53,6 +53,7 @@ void loop() {
 }
 
 void handle_OnConnect() {
+  digitalWrite(LED, 0);
   temperatura = dht.readTemperature();  //Realiza a leitura da temperatura
   umidade = dht.readHumidity(); //Realiza a leitura da umidade
   Serial.print("Temperatura: ");
@@ -62,6 +63,8 @@ void handle_OnConnect() {
   Serial.print(umidade); //Imprime no monitor serial o valor da umidade lida
   Serial.println("%");
   server.send(200, "text/html", EnvioHTML(temperatura, umidade)); //Envia as informações usando o código 200, especifica o conteúdo como "text/html" e chama a função EnvioHTML
+  digitalWrite(LED, 1);
+  
 
 }
 
@@ -73,7 +76,7 @@ void handle_NotFound() { //Função para lidar com o erro 404
 String EnvioHTML(float Temperaturastat, float Umidadestat) { //Exibindo a página da web em HTML
   String ptr = "<!DOCTYPE HTML>\n<HTML>\n"; //Indica o envio do código HTML
   ptr += "<HEAD>\n<META charset=\"UTF-8\" name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n"; //Torna a página da Web responsiva em qualquer navegador Web
-  ptr += "<META http-equiv='refresh' content='2'>\n";//Atualizar browser a cada 2 segundos
+  ptr += "<META http-equiv='refresh' content='5'>\n";//Atualizar browser a cada 5 segundos
   ptr += "<TITLE>Monitor de Temperatura e Umidade</TITLE>\n"; //Define o título da página
 
   //Configurações de fonte do título e do corpo do texto da página web
@@ -82,6 +85,7 @@ String EnvioHTML(float Temperaturastat, float Umidadestat) { //Exibindo a págin
   ptr += "h1 {margin: 50px auto 30px; margin-bottom: 75px;}\n";
   ptr += "p {font-size: 25px;color: #000000; margin-bottom: 10px;}\n";
   ptr += ".footer {position: fixed; left: 0; bottom: 0; width: 100%;}\n";
+  ptr += "#segundos-pagina {position: fixed; left: 0; bottom: 50%; width: 100%;font-size: 20px;};\n";
   ptr += "</STYLE>\n";
   ptr += "</HEAD>\n";
   ptr += "<BODY>\n";
@@ -95,8 +99,17 @@ String EnvioHTML(float Temperaturastat, float Umidadestat) { //Exibindo a págin
   ptr += "<P><B>Umidade: </B>";
   ptr += (int)Umidadestat;
   ptr += "%</P>";
-
+  ptr += "<div id='segundos-pagina'>Atualizado a 1 segundos atrás.</div>\n";
+  
   ptr += "</DIV>\n";
+  ptr += "<SCRIPT>\n";
+  ptr += "var segundos = 1;";
+  ptr += "var count = document.getElementById('segundos-pagina');";
+  ptr += "function ContarSegundos() {";
+  ptr += "segundos += 1;";
+  ptr += "count.innerText = \"Atualizado a \" + segundos + \" segundos atrás.\";}";
+  ptr += "var cancel = setInterval(ContarSegundos, 1000);";
+  ptr += "</SCRIPT>";
   ptr += "</BODY>\n";
   ptr += "<FOOTER class=\"footer\">\n";
   ptr += "<FONT size=\"5px\">Feito por Emanuel Peixoto</FONT>\n";
