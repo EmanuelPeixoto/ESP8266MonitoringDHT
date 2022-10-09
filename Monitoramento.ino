@@ -9,7 +9,7 @@ ESP8266WebServer server(80); //server na porta 80
 
 #define DHTPIN 4 //Pino digital D2 (GPIO4) conectado ao DHT11
 #define DHTTYPE DHT11 //Tipo do sensor DHT11
-#define LED 2 // LED imbutido
+#define LED 2 // LED embutido
 
 DHT dht(DHTPIN, DHTTYPE); //Inicializando o objeto dht do tipo DHT passando como parâmetro o pino (DHTPIN) e o tipo do sensor (DHTTYPE)
 
